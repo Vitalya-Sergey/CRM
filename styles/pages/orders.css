@@ -311,3 +311,28 @@ main {
 .modal__container{
     width: 17% ;
 }
+
+.modal_form-group {
+    width: 100%;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.modal_form-group label {
+    font-weight: 500;
+    color: #333;
+}
+
+.modal_form-group input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #828282;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.modal_form-group input:focus {
+    border-color: #4CAF50;
+}
