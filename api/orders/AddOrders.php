@@ -29,7 +29,8 @@ if ($_SERVER['REQUEST_METHOD']==='POST'){
 
     $total = $db->query("SELECT SUM(price) FROM products 
     WHERE id IN (" . implode(',', $formData['products']) . ")")->fetchColumn();
-
+    $token = $_SESSION['token'];
+    $adminID = $db->query("SELECT id FROM users WHERE token = '$token'")->fetchAll(PDO::FETCH_ASSOC)[0]['id'];
     $clientID = $formData['client'] === 'new' ? 
     time() :
     $formData['client'];
@@ -49,16 +50,18 @@ if ($_SERVER['REQUEST_METHOD']==='POST'){
     $orders = [
         'id' => time(),
         'client_id' => $clientID,
-        'total' => $total
+        'total' => $total,
+        'admin' => $adminID
     ];
 
 
     $db->prepare(
-        "INSERT INTO `orders` (`id`, `client_id`, `total`) VALUES (?, ?, ?)"
+        "INSERT INTO `orders` (`id`, `client_id`, `total`, `admin`) VALUES (?, ?, ?, ?)"
     )->execute([
         $orders['id'],
         $orders['client_id'], 
-        $orders['total']
+        $orders['total'],
+        $orders['admin']
     ]);
     // записать элементы заказа в orders_items order_id, product_id, quantity=1, price=цена продукта
     foreach ($formData['products'] as $key => $product) {

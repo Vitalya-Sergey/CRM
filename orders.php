@@ -107,6 +107,7 @@ require_once 'api/helpers/selectDefaultValue.php';
                         <th>Дата заказа</th>
                         <th>Цена</th>
                         <th>Инфор. о заказе</th>
+                        <th>Кто добавил</th>
                         <th>Статус</th>
                         <th>Редак.</th>
                         <th>Удалить</th>

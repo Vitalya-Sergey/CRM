@@ -1,8 +1,8 @@
 {
-    "name": "305-3/crm",
+    "name": "user/crm",
     "autoload": {
         "psr-4": {
-            "3053\\Crm\\": "src/"
+            "User\\Crm\\": "src/"
         }
     },
     "authors": [
@@ -12,7 +12,6 @@
         }
     ],
     "require": {
-        "mpdf/mpdf": "^6.1",
         "dompdf/dompdf": "^3.1"
     }
 }

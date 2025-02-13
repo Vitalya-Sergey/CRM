@@ -13,10 +13,9 @@ if($_SERVER['REQUEST_METHOD']==='GET' && isset($_GET['id'])){
     JOIN clients c ON o.client_id = c.id
     WHERE o.id = ?";
 
-    $stmt = $conn->prepare($orderQuery);
-    $stmt->bind_param("i", $orderID);
-    $stmt->execute();
-    $orderData = $stmt->get_result()->fetch_assoc();
+    $stmt = $db->prepare($orderQuery);
+    $stmt->execute([$orderID]);
+    $orderData = $stmt->fetch(PDO::FETCH_ASSOC);
 
 
 // Получаем товары заказа
@@ -25,14 +24,9 @@ if($_SERVER['REQUEST_METHOD']==='GET' && isset($_GET['id'])){
     JOIN products p ON oi.product_id = p.id
     WHERE oi.order_id = ?";
 
-    $stmt = $conn->prepare($itemsQuery);
-    $stmt->bind_param("i", $orderID);
-    $stmt->execute();
-    $orderItems = [];
-
-    foreach($itemsResult as $item) {
-    $orderItems[] = $item;
-    }   
+    $stmt = $db->prepare($itemsQuery);
+    $stmt->execute([$orderID]);
+    $orderItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $data = [
         "orderID" => $orderID,
@@ -43,11 +37,13 @@ if($_SERVER['REQUEST_METHOD']==='GET' && isset($_GET['id'])){
         "orderTotal" => $orderData['orderTotal']
     ];
 
+
     $dompdf = new Dompdf();
     $dompdf->loadHtml('Hello world!');
     $dompdf->setPaper('A4', 'landscape');
     $dompdf->render();
-    $dompdf->stream();
     $dompdf->stream("order_$orderID.pdf");
-// }
+}
+?>
+}
 ?>
