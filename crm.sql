@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1
--- Время создания: Фев 06 2025 г., 11:16
--- Версия сервера: 10.4.28-MariaDB
--- Версия PHP: 8.2.4
+-- Время создания: Фев 14 2025 г., 04:22
+-- Версия сервера: 10.4.32-MariaDB
+-- Версия PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -44,7 +44,8 @@ INSERT INTO `clients` (`id`, `name`, `email`, `phone`, `birthday`, `created_at`)
 (1, 'Ivan Ivanov', 'ivan.ivanov@example.com', '+79991234567', '1985-05-15', '2025-01-13 09:21:57'),
 (2, 'Maria Petrovna', 'maria.petrova@example.com', '+79991234568', '1990-07-20', '2025-01-13 09:21:57'),
 (3, 'Sergei Sidorov', 'sergey.sidorov@example.com', '+79991234569', '1988-03-30', '2025-01-13 09:21:57'),
-(4, 'ИльченкоСергей', 'dsf@mail.ru', '+79991237456', '2025-01-04', '2025-01-29 05:24:38');
+(6, 'Pedik Petr', 'dmitry.dmitriev@mail.ru', '13895714124', '2025-01-31', '2025-02-03 03:04:50'),
+(1738895546, 'не указано', 'lox@mail.ru', 'не указано', '0000-00-00', '2025-02-07 02:32:26');
 
 -- --------------------------------------------------------
 
@@ -57,18 +58,35 @@ CREATE TABLE `orders` (
   `client_id` int(11) NOT NULL,
   `order_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `total` decimal(10,2) DEFAULT NULL,
-  `status` enum('1','0') DEFAULT '1'
+  `status` enum('1','0') DEFAULT '1',
+  `admin` int(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Дамп данных таблицы `orders`
 --
 
-INSERT INTO `orders` (`id`, `client_id`, `order_date`, `total`, `status`) VALUES
-(1, 1, '2025-01-13 09:25:36', 300.00, '0'),
-(2, 2, '2025-01-13 09:25:36', 150.50, '1'),
-(3, 1, '2025-01-13 09:25:36', 200.00, '0'),
-(1738836924, 3, '2025-02-06 10:15:24', 450.75, '1');
+INSERT INTO `orders` (`id`, `client_id`, `order_date`, `total`, `status`, `admin`) VALUES
+(3, 1, '2025-01-13 09:25:36', 200.00, '0', 1),
+(5, 2, '2025-01-14 03:15:45', 300.00, '0', 1),
+(1738732062, 6, '2025-02-05 05:07:42', 1600.00, '1', 1),
+(1738732563, 3, '2025-02-05 05:16:03', 250.50, '0', 1),
+(1738732643, 2, '2025-02-05 05:17:23', 500.00, '0', 1),
+(1738732738, 6, '2025-02-05 05:18:58', 500.00, '0', 1),
+(1738818886, 3, '2025-02-06 05:14:46', 623.00, '1', 1),
+(1738818896, 2, '2025-02-06 05:14:56', 1750.50, '1', 1),
+(1738895546, 1738895546, '2025-02-07 02:32:26', 250.50, '1', 1),
+(1739250762, 2, '2025-02-11 05:12:42', 1750.50, '1', 1),
+(1739250763, 0, '2025-02-13 05:08:16', NULL, '1', 1),
+(1739423871, 2, '2025-02-13 05:17:51', 2123.00, '0', 2),
+(1739424654, 1738895546, '2025-02-13 05:30:54', 2123.00, '0', 2),
+(1739424731, 1738895546, '2025-02-13 05:32:11', 250.50, '0', 2),
+(1739424751, 6, '2025-02-13 05:32:31', 2123.00, '0', 3),
+(1739425148, 6, '2025-02-13 05:39:08', 1500.00, '1', 3),
+(1739426074, 6, '2025-02-13 05:54:34', 623.00, '1', 3),
+(1739426459, 6, '2025-02-13 06:00:59', 1500.00, '1', 1),
+(1739426499, 1738895546, '2025-02-13 06:01:39', 2123.00, '1', 2),
+(1739426533, 3, '2025-02-13 06:02:13', 1750.50, '1', 1);
 
 -- --------------------------------------------------------
 
@@ -89,12 +107,43 @@ CREATE TABLE `order_items` (
 --
 
 INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `price`) VALUES
-(1, 1, 1, 2, 100.00),
-(2, 1, 2, 1, 150.50),
-(3, 2, 3, 1, 200.00),
-(4, 3, 4, 1, 250.75),
-(5, 1738836924, 3, 1, 200.00),
-(6, 1738836924, 4, 1, 250.75);
+(23, 3, 6, 12, 450.00),
+(26, 5, 8, 13, 500.00),
+(36, 1738732062, 1, 1, 100.00),
+(37, 1738732062, 6, 1, 1500.00),
+(38, 1738732563, 1, 1, 100.00),
+(39, 1738732563, 2, 1, 150.50),
+(40, 1738732643, 9, 1, 500.00),
+(41, 1738732738, 9, 1, 500.00),
+(42, 1738818886, 8, 1, 123.00),
+(43, 1738818886, 9, 1, 500.00),
+(44, 1738818896, 1, 1, 100.00),
+(45, 1738818896, 2, 1, 150.50),
+(46, 1738818896, 6, 1, 1500.00),
+(47, 1738895546, 1, 1, 100.00),
+(48, 1738895546, 2, 1, 150.50),
+(49, 1739250762, 1, 1, 100.00),
+(50, 1739250762, 2, 1, 150.50),
+(51, 1739250762, 6, 1, 1500.00),
+(52, 1739423871, 6, 1, 1500.00),
+(55, 1739424654, 6, 1, 1500.00),
+(56, 1739424654, 8, 1, 123.00),
+(57, 1739424654, 9, 1, 500.00),
+(58, 1739424731, 1, 1, 100.00),
+(59, 1739424731, 2, 1, 150.50),
+(60, 1739424751, 6, 1, 1500.00),
+(61, 1739424751, 8, 1, 123.00),
+(62, 1739424751, 9, 1, 500.00),
+(63, 1739425148, 6, 1, 1500.00),
+(64, 1739426074, 8, 1, 123.00),
+(65, 1739426074, 9, 1, 500.00),
+(66, 1739426459, 6, 1, 1500.00),
+(67, 1739426499, 6, 1, 1500.00),
+(68, 1739426499, 8, 1, 123.00),
+(69, 1739426499, 9, 1, 500.00),
+(70, 1739426533, 1, 1, 100.00),
+(71, 1739426533, 2, 1, 150.50),
+(72, 1739426533, 6, 1, 1500.00);
 
 -- --------------------------------------------------------
 
@@ -117,8 +166,9 @@ CREATE TABLE `products` (
 INSERT INTO `products` (`id`, `name`, `description`, `price`, `stock`) VALUES
 (1, 'Tovar 1', 'Opisanie tovara 1', 100.00, 50),
 (2, 'Tovar 2', 'Opisanie tovara 2', 150.50, 30),
-(3, 'Tovar 3', 'Opisanie tovara 3', 200.00, 20),
-(4, 'Tovar 4', 'Opisanie tovara 4', 250.75, 10);
+(6, 'какашки', 'очень вкусные', 1500.00, 75),
+(8, 'товарик3', 'не будет', 123.00, 15),
+(9, 'стул', 'кожанный', 500.00, 30);
 
 -- --------------------------------------------------------
 
@@ -140,7 +190,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `login`, `password`, `name`, `surname`, `token`) VALUES
-(1, 'admin', 'admin123', 'Administrator', 'kitchen', 'bG9naW49J2FkbWluJyZwYXNzd29yZD0nYWRtaW4xMjMnJnVuaXF1ZT0xNzM4ODM2OTA2'),
+(1, 'admin', 'admin123', 'Administrator', 'kitchen', 'bG9naW49J2FkbWluJyZwYXNzd29yZD0nYWRtaW4xMjMnJnVuaXF1ZT0xNzM5NDk5MDk5'),
 (2, 'manager', 'manager456', 'Manager', '', ''),
 (3, 'sales', 'sales789', 'Sales Representative', '', '');
 
@@ -152,14 +202,16 @@ INSERT INTO `users` (`id`, `login`, `password`, `name`, `surname`, `token`) VALU
 -- Индексы таблицы `clients`
 --
 ALTER TABLE `clients`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- Индексы таблицы `orders`
 --
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `client_id` (`client_id`);
+  ADD KEY `client_id` (`client_id`),
+  ADD KEY `orders_ibfk_1` (`admin`);
 
 --
 -- Индексы таблицы `order_items`
@@ -190,25 +242,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT для таблицы `clients`
 --
 ALTER TABLE `clients`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1738895547;
 
 --
 -- AUTO_INCREMENT для таблицы `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1738836925;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1739426534;
 
 --
 -- AUTO_INCREMENT для таблицы `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- AUTO_INCREMENT для таблицы `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT для таблицы `users`
@@ -224,7 +276,7 @@ ALTER TABLE `users`
 -- Ограничения внешнего ключа таблицы `orders`
 --
 ALTER TABLE `orders`
-  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`);
+  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`admin`) REFERENCES `users` (`id`);
 
 --
 -- Ограничения внешнего ключа таблицы `order_items`

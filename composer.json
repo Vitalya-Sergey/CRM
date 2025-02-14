@@ -1,13 +1,13 @@
 {
-    "name": "user/crm",
+    "name": "301_03/crm",
     "autoload": {
         "psr-4": {
-            "User\\Crm\\": "src/"
+            "30103\\Crm\\": "src/"
         }
     },
     "authors": [
         {
-            "name": "Your Name",
+            "name": "reg",
             "email": "you@example.com"
         }
     ],

@@ -8,9 +8,11 @@ if($_SERVER['REQUEST_METHOD']==='GET' && isset($_GET['id'])){
     $orderID = $_GET['id'];
     
 
-    $orderQuery = "SELECT o.id, o.order_date, o.total as orderTotal, c.name as clientName
+    $orderQuery = "SELECT o.id, o.order_date, o.total as orderTotal, c.name as clientName, 
+    u.name as adminName
     FROM orders o
     JOIN clients c ON o.client_id = c.id
+    JOIN users u ON o.admin = u.id
     WHERE o.id = ?";
 
     $stmt = $db->prepare($orderQuery);
@@ -37,13 +39,61 @@ if($_SERVER['REQUEST_METHOD']==='GET' && isset($_GET['id'])){
         "orderTotal" => $orderData['orderTotal']
     ];
 
+    $html = '
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            @font-face {
+                font-family: "DejaVu Sans";
+                src: url("../../fonts/DejaVuSans.ttf") format("truetype");
+            }
+            body {
+                font-family: "DejaVu Sans", sans-serif;
+            }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+            th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+            .header { margin-bottom: 20px; }
+            .total { font-weight: bold; text-align: right; }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>Чек №' . $data['orderID'] . '</h1>
+            <p>Дата заказа: ' . $data['orderDate'] . '</p>
+            <p>Клиент: ' . $data['clientName'] . '</p>
+            <p>Менеджер: ' . $data['adminName'] . '</p>
+        </div>
+
+        <table>
+            <tr>
+                <th>Наименование</th>
+                <th>Количество</th>
+                <th>Сумма</th>
+            </tr>';
+
+    foreach($data['orderItems'] as $item) {
+        $html .= '
+            <tr>
+                <td>' . $item['name'] . '</td>
+                <td>' . $item['quantity'] . '</td>
+                <td>' . $item['total'] . ' руб.</td>
+            </tr>';
+    }
+
+    $html .= '
+        </table>
+        <div class="total">
+            Итого: ' . $data['orderTotal'] . ' руб.
+        </div>
+    </body>
+    </html>';
 
     $dompdf = new Dompdf();
-    $dompdf->loadHtml('Hello world!');
-    $dompdf->setPaper('A4', 'landscape');
+    $dompdf->set_option('defaultFont', 'DejaVu Sans');
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait'); // изменил на портретную ориентацию
     $dompdf->render();
-    $dompdf->stream("order_$orderID.pdf");
-}
-?>
+    $dompdf->stream("Чек_№" . $data['orderID'] . ".pdf");
 }
 ?>
