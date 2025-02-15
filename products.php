@@ -12,14 +12,6 @@ AuthCheck('', 'login.php');
 require_once 'api/helpers/inputDefaultValue.php';
 require_once 'api/helpers/selectDefaultValue.php';
 
-require 'vendor/autoload.php';
-use Endroid\QrCode\QrCode;
-use Endroid\QrCode\Writer\PngWriter;
-$QrCode= new QrCode('Hello, world!');
-$writer= new PngWriter();
-$result= $writer->write($QrCode);
-header('Content-Type: '.$result->getMimeType());
-echo $result->getString();
 ?>
 
 <!DOCTYPE html>
