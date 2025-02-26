@@ -92,6 +92,54 @@ require_once 'api/helpers/selectDefaultValue.php';
             <h2 class="clients_title">Список клиентов</h2>
             <button onclick="MicroModal.show('add-modal')" class="clients_add"><i class="fa fa-plus-square fa-2x"
                     aria-hidden="true"></i></button>
+            
+            <div style="text-align: center;">
+                <?php 
+                require 'api/DB.php';
+                $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                $maxClients = 5;
+                $_SESSION['maxClients'] = $maxClients;
+                $offset = ($currentPage - 1) * $maxClients;
+                $_SESSION['offset'] = $offset;
+
+                $search = isset($_GET['search']) ? $_GET['search'] : '';
+                $search_name = isset($_GET['search_name']) ? $_GET['search_name'] : '';
+                $sort = isset($_GET['sort']) ? $_GET['sort'] : '';
+
+                $totalClients =  $db -> query("
+                SELECT COUNT(*) as count FROM clients WHERE LOWER(name) LIKE '%$search%'
+                ")->fetchAll()[0]['count'];
+
+                $maxPage = ceil($totalClients / $maxClients);
+
+                // Проверка на корректность значения текущей страницы
+                if ($currentPage < 1) {
+                    $currentPage = 1;
+                } elseif ($currentPage > $maxPage) {
+                    $currentPage = $maxPage;
+                }
+
+                $prev = $currentPage - 1;
+                if ($currentPage > 1) {
+                    echo "  <button><a href='?page=$prev&search=".urlencode($search)."&search_name=$search_name&sort=$sort'><i class='fa fa-chevron-left' aria-hidden='true'></i></a></button>
+                            ";
+                } else {
+                    echo "  <button style='color: gray; cursor: not-allowed;' disabled><i class='fa fa-chevron-left' aria-hidden='true'></i></button>
+                            ";
+                }
+                $next = $currentPage + 1;     
+                if ($currentPage < $maxPage) {
+                    echo "  <button><a href='?page=$next&search=".urlencode($search)."&search_name=$search_name&sort=$sort'><i class='fa fa-chevron-right' aria-hidden='true'></i></a></button>
+                            ";
+                } else {
+                    echo "  <button style='color: gray; cursor: not-allowed;' disabled><i class='fa fa-chevron-right' aria-hidden='true'></i></button>
+                            ";
+                }
+                echo "  <p>$currentPage / $maxPage</p> ";
+                ?>
+                
+            </div>
+            
             <div class="container">
                 <table>
                     <thead>
@@ -110,10 +158,8 @@ require_once 'api/helpers/selectDefaultValue.php';
                         require 'api/DB.php';
                         require_once 'api/clients/OutputClients.php';
                         require_once 'api/clients/ClientsSearch.php';
-                        // $clients = $db->query(
-                        //     "SELECT * FROM clients
-                        // ")->fetchAll();
-                        $clients = ClientsSearch($_GET,$db);
+
+                        $clients = ClientsSearch($_GET, $db);
                         OutputClients($clients);
                         ?>
                     </tbody>
