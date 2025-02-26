@@ -3,17 +3,21 @@ session_start();
 require_once '../DB.php';
 require_once '../../vendor/autoload.php';
 use Dompdf\Dompdf;
+require_once '../helpers/convertDate.php'; // Подключаем файл с функциями
 
-$_SESSION['clients-errors']='';
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])){
     $clientID = $_GET['id'];
-    $dateFROM = $_GET['from'];
-    $dateTO = $_GET['to'];
-
-    if (new DateTime($dateFROM) > new DateTime($dateTO)){
-        $_SESSION['clients-errors']= 'Некорректное значение ввода даты';
+    $dateFROM = $_GET['from'] ?? null; // Устанавливаем значение по умолчанию
+    $dateTO = $_GET['to'] ?? null; // Устанавливаем значение по умолчанию
+    $_SESSION['clients-errors']='';
+    
+    // Проверяем, указаны ли даты
+    if ($dateFROM && $dateTO && new DateTime($dateFROM) > new DateTime($dateTO)) {
+        $_SESSION['clients-errors'] = 'Некорректное значение ввода даты';
         header('Location: ../../clients.php');
+        exit; // Завершаем выполнение скрипта
     }
     
     $history = [
@@ -31,15 +35,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])){
         $history['user'] = $client['name']; // Сохраняем ФИО пользователя
     }
 
-    // Добавляем запрос для получения заказов по ID клиента
+    // Добавляем запрос для получения заказов по ID клиента в указанный период
     $query = "SELECT * FROM orders WHERE client_id = ?";
+    $params = [$clientID];
+
+    // Если даты указаны, добавляем условия для выборки
+    if ($dateFROM && $dateTO) {
+        $query .= " AND order_date BETWEEN ? AND ?";
+        $params[] = $dateFROM;
+        $params[] = $dateTO;
+    }
+
     $stmt = $db->prepare($query);
-    $stmt->execute([$clientID]);
+    $stmt->execute($params);
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Проверяем, есть ли заказы в указанном периоде
+    if (empty($orders)) {
+        $_SESSION['clients-errors'] = 'В этот период данный клиент ничего не заказывал';
+        header('Location: ../../clients.php');
+        exit; // Завершаем выполнение скрипта
+    }
 
     foreach ($orders as $order) {
         // Запрос для получения элементов заказа
-        $itemsQuery = "SELECT * FROM order_items WHERE order_id = ?";
+        $itemsQuery = "SELECT oi.id, oi.quantity, oi.price, p.name 
+        FROM order_items oi 
+        JOIN products p ON oi.product_id = p.id 
+        WHERE oi.order_id = ?";
         $itemsStmt = $db->prepare($itemsQuery);
         $itemsStmt->execute([$order['id']]);
         $items = $itemsStmt->fetchAll(PDO::FETCH_ASSOC);
@@ -56,9 +79,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])){
     // Добавляем код для генерации чека
     $data = [
         "clientID" => $clientID,
-        "orderDate" => (!empty($dateFROM) && !empty($dateTO)) ? $dateFROM . ' - ' . $dateTO : 'Все время', // если данные не выбраны, выводим "Все время"
-        "orders" => $history['orders']
+        "orderDate" => (!empty($dateFROM) && !empty($dateTO)) ? convertDate($dateFROM) . ' - ' . convertDate($dateTO) : 'Все время', // Применяем функцию convertDate
+        "orders" => []
     ];
+
+    // Получаем заказы и элементы заказа
+    foreach ($history['orders'] as $order) {
+        // Запрос для получения элементов заказа с данными из таблицы products
+        $itemsQuery = "
+            SELECT oi.id, oi.quantity, oi.price, p.name 
+            FROM order_items oi 
+            JOIN products p ON oi.product_id = p.id 
+            WHERE oi.order_id = ?";
+        
+        $itemsStmt = $db->prepare($itemsQuery);
+        $itemsStmt->execute([$order['id']]);
+        $items = $itemsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Добавляем заказ и его элементы в массив $data
+        $data['orders'][] = [
+            'id' => $order['id'],
+            'date' => $order['date'],
+            'total' => $order['total'],
+            'items' => $items // Добавляем элементы заказа
+        ];
+    }
 
     $html = '
     <html lang="ru">
@@ -82,25 +127,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])){
         <div class="header">
             <h1>История заказов клиента №' . $data['clientID'] . '</h1>
             <p>Период: ' . $data['orderDate'] . '</p>
-        </div>
-        <table>
-            <tr>
-                <th>Заказ ID</th>
-                <th>Дата</th>
-                <th>Сумма</th>
-            </tr>';
+        </div>';
 
     foreach ($data['orders'] as $order) {
         $html .= '
-            <tr>
-                <td>' . $order['id'] . '</td>
-                <td>' . $order['date'] . '</td>
-                <td>' . $order['total'] . ' руб.</td>
-            </tr>';
+            <h3 class="order_number">Заказ №' . $order['id'] . '</h3>
+            <time class="order_date">Дата оформления : ' . convertDateTime($order['date']) . '</time>
+            <table>
+                <tr>
+                    <th>Название товаров</th>
+                    <th>Количество</th>
+                    <th>Цена</th>
+                </tr>';
+
+        // Перебираем элементы заказа
+        $totalPrice = 0; // Инициализируем переменную для подсчета общей суммы
+        foreach ($order['items'] as $item) {
+            $html .= '
+                <tr>
+                    <td>' . htmlspecialchars($item['name']) . '</td>
+                    <td>' . htmlspecialchars($item['quantity']) . '</td>
+                    <td>' . htmlspecialchars($item['price']) . ' руб.</td>
+                </tr>';
+            $totalPrice += $item['price'] * $item['quantity']; // Считаем общую сумму
+        }
+
+        // Добавляем строку с итоговой суммой
+        $html .= '
+                <tr>
+                    <td colspan="2" class="total">Итого:</td>
+                    <td class="total">' . htmlspecialchars($totalPrice) . ' руб.</td>
+                </tr>';
+
+        $html .= '
+            </table>';
     }
 
     $html .= '
-        </table>
     </body>
     </html>';
 
