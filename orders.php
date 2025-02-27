@@ -86,10 +86,21 @@ require_once 'api/helpers/selectDefaultValue.php';
                         selectDefaultValue('sort', $selectSortOptions, '');
                         ?>
                     </select>
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="checkbox" name="checkbox" <?php echo isset($_GET['checkbox']) ? 'checked' : ''; ?>>
-                        <label for="checkbox">Показать неактивные заказы</label>
-                    </div>
+                    <label for="search">Выводить </label>
+                    <select name="checkbox" id="checkbox">
+                    <?php $selectCheckboxOptions = [[
+                            'key' => '',
+                            'value' => 'Все'
+                        ],[
+                            'key' => 'AND orders.status = "1"',
+                            'value' => 'Активные'
+                        ],[
+                            'key' => 'AND orders.status = "0"',
+                            'value' => 'Неактивные'
+                        ]];
+                        selectDefaultValue('checkbox', $selectCheckboxOptions, '');
+                        ?>
+                    </select>
                     <button type="submit">Поиск</button>
                     <a class="search" href="?" >Сбросить</a>
                 </form>
@@ -99,6 +110,86 @@ require_once 'api/helpers/selectDefaultValue.php';
             <h2 class="orders_title">Список товаров</h2>
             <button onclick="MicroModal.show('add-modal')" class="orders_add"><i class="fa fa-plus-square fa-2x"
                     aria-hidden="true"></i></button>
+
+                    <div style="text-align: center;">
+                <?php 
+                require 'api/DB.php';
+                $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                $maxOrders = 5;
+                $_SESSION['maxOrders'] = $maxOrders;
+                $offset = ($currentPage - 1) * $maxOrders;
+                $_SESSION['offset'] = $offset;
+
+                function CountSearch($params, $db){
+                    $search = isset($params['search']) ? $params['search'] : '';
+                    $search_name = isset($params['search_name']) ? $params['search_name'] : 'name';
+                    $sort = isset($params['sort']) ? $params['sort'] : '';
+                    $status = isset($params['checkbox']) ? $params['checkbox'] : '';
+                
+                    if ($sort) { 
+                        $sort = "ORDER BY $search_name $sort";
+                    } 
+                    $search = trim(strtolower($search));
+                
+                    $orders = $db->query(
+                        "SELECT COUNT(*) as count
+                        FROM orders 
+                        JOIN clients ON orders.client_id = clients.id 
+                        JOIN order_items ON orders.id = order_items.order_id 
+                        JOIN products ON order_items.product_id = products.id 
+                        JOIN users ON orders.admin = users.id 
+                        WHERE (LOWER(clients.name) LIKE '%$search%' OR LOWER(products.name) LIKE '%$search%') $status
+                        GROUP BY orders.id, clients.name, orders.order_date, orders.total 
+                        $sort
+                        ")->fetchAll()[0]['count'];
+                   
+                    return $orders;
+                }
+                $totalOrders = CountSearch($_GET, $db);
+                $maxPage = ceil($totalOrders / $maxOrders);
+
+                // Проверка на корректность значения текущей страницы
+                if ($currentPage < 1) {
+                    $currentPage = 1;
+                } elseif ($currentPage > $maxPage) {
+                    $currentPage = $maxPage;
+                }
+
+                $prev = $currentPage - 1;
+                if ($currentPage > 1) {
+                    echo "  <button><a href='?page=$prev&search=".urlencode($search)."&search_name=$search_name&sort=$sort&checkbox=$status'><i class='fa fa-chevron-left' aria-hidden='true'></i></a></button>
+                            ";
+                } else {
+                    echo "  <button style='color: gray; cursor: not-allowed;' disabled><i class='fa fa-chevron-left' aria-hidden='true'></i></button>
+                            ";
+                }
+
+                for ($i=1; $i <= $maxPage; $i++){
+                            
+                                        if ($currentPage == $i) {
+                                            echo "  <a  href='?page=$i&search=".urlencode($search)."&search_name=$search_name&sort=$sort&checkbox=$status' style='color: red; cursor: not-allowed;'>$i</a>
+                                                    ";
+                                        } else {
+                                            echo "   <a  href='?page=$i&search=".urlencode($search)."&search_name=$search_name&sort=$sort&checkbox=$status' style='color: green;'>$i </a>
+                                                    ";
+                                        }
+                                }
+                              
+
+                $next = $currentPage + 1;     
+                if ($currentPage < $maxPage) {
+                    echo "  <button><a href='?page=$next&search=".urlencode($search)."&search_name=$search_name&sort=$sort&checkbox=$status'><i class='fa fa-chevron-right' aria-hidden='true'></i></a></button>
+                            ";
+                } else {
+                    echo "  <button style='color: gray; cursor: not-allowed;' disabled><i class='fa fa-chevron-right' aria-hidden='true'></i></button>
+                            ";
+                }
+                // echo "  <p>$currentPage / $maxPage</p> ";
+
+                  ?>
+                
+            </div>
+
             <div class="container">
                 <table>
                     <thead>
@@ -119,33 +210,9 @@ require_once 'api/helpers/selectDefaultValue.php';
                         require 'api/DB.php';
                         require_once 'api/orders/OutputOrders.php';
                         require_once 'api/orders/OrdersSearch.php';
-                        // $orders = $db->query(
-                        //      "SELECT orders.id, clients.name, orders.order_date, orders.total, 
-                        //         GROUP_CONCAT(CONCAT(products.name, ' : ', order_items.price, ' : ', order_items.quantity, ' кол.') SEPARATOR ', ') AS product_names
-                        //         FROM orders 
-                        //         JOIN clients ON orders.client_id = clients.id 
-                        //         JOIN order_items ON orders.id = order_items.order_id 
-                        //         JOIN products ON order_items.product_id = products.id 
-                        //         GROUP BY  orders.id, clients.name, orders.order_date, orders.total
-                        // ")->fetchAll();
                         $orders = OrdersSearch($_GET,$db);
                         OutputOrders($orders);
                         ?>
-                        <!-- <tr>
-                            <td>0</td>
-                            <td>Футболка</td>
-                            <td>2024-01-12 15:20:22</td>
-                            <td>1000.00</td>
-                            <td>Заказ №1</td>
-                            <td>10</td>
-                            <td>10000.00</td>
-                            <td onclick="MicroModal.show('edit-modal')"><i class="fa fa-pencil" aria-hidden="true"></i>
-                            </td>
-                            <td onclick="MicroModal.show('delete-modal')"><i class="fa fa-trash" aria-hidden="true"></i>
-                            </td>
-                            <td><i class="fa fa-qrcode" aria-hidden="true"></i></td>
-                            <td onclick="MicroModal.show('history-modal')"><i class="fa fa-info-circle" aria-hidden="true"></i></td>
-                        </tr> -->
                     </tbody>
                 </table>
             </div>
@@ -328,5 +395,21 @@ require_once 'api/helpers/selectDefaultValue.php';
     <script defer src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
     <script defer src="scripts/initClientsModal.js"></script>
     <script defer src="scripts/orders.js"></script>
+    <script>
+    function updateCheckbox() {
+        const checkbox = document.getElementById('checkbox');
+        const url = new URL(window.location.href);
+        
+        // Устанавливаем или удаляем параметр checkbox в URL
+        if (checkbox.checked) {
+            url.searchParams.set('checkbox', '1');
+        } else {
+            url.searchParams.delete('checkbox');
+        }
+        
+        // Обновляем страницу с новыми параметрами
+        window.location.href = url.toString();
+    }
+    </script>
 </body>
 </html>

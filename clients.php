@@ -127,6 +127,19 @@ require_once 'api/helpers/selectDefaultValue.php';
                     echo "  <button style='color: gray; cursor: not-allowed;' disabled><i class='fa fa-chevron-left' aria-hidden='true'></i></button>
                             ";
                 }
+
+                for ($i=1; $i <= $maxPage; $i++){
+                            
+                                        if ($currentPage == $i) {
+                                            echo "  <a  href='?page=$i&search=".urlencode($search)."&search_name=$search_name&sort=$sort' style='color: red; cursor: not-allowed;'>$i</a>
+                                                    ";
+                                        } else {
+                                            echo "   <a  href='?page=$i&search=".urlencode($search)."&search_name=$search_name&sort=$sort' style='color: green;'>$i </a>
+                                                    ";
+                                        }
+                                }
+                              
+
                 $next = $currentPage + 1;     
                 if ($currentPage < $maxPage) {
                     echo "  <button><a href='?page=$next&search=".urlencode($search)."&search_name=$search_name&sort=$sort'><i class='fa fa-chevron-right' aria-hidden='true'></i></a></button>
@@ -135,8 +148,9 @@ require_once 'api/helpers/selectDefaultValue.php';
                     echo "  <button style='color: gray; cursor: not-allowed;' disabled><i class='fa fa-chevron-right' aria-hidden='true'></i></button>
                             ";
                 }
-                echo "  <p>$currentPage / $maxPage</p> ";
-                ?>
+                // echo "  <p>$currentPage / $maxPage</p> ";
+
+                  ?>
                 
             </div>
             

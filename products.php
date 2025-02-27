@@ -91,6 +91,68 @@ require_once 'api/helpers/selectDefaultValue.php';
             <h2 class="products_title">Список товаров</h2>
             <button onclick="MicroModal.show('add-modal')" class="products_add"><i class="fa fa-plus-square fa-2x"
                     aria-hidden="true"></i></button>
+
+                    <div style="text-align: center;">
+                <?php 
+                require 'api/DB.php';
+                $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                $maxProducts = 5;
+                $_SESSION['maxProducts'] = $maxProducts;
+                $offset = ($currentPage - 1) * $maxProducts;
+                $_SESSION['offset'] = $offset;
+
+                $search = isset($_GET['search']) ? $_GET['search'] : '';
+                $search_name = isset($_GET['search_name']) ? $_GET['search_name'] : '';
+                $sort = isset($_GET['sort']) ? $_GET['sort'] : '';
+
+                $totalProducts =  $db -> query("
+                SELECT COUNT(*) as count FROM products WHERE LOWER(name) LIKE '%$search%'
+                ")->fetchAll()[0]['count'];
+
+                $maxPage = ceil($totalProducts / $maxProducts);
+
+                // Проверка на корректность значения текущей страницы
+                if ($currentPage < 1) {
+                    $currentPage = 1;
+                } elseif ($currentPage > $maxPage) {
+                    $currentPage = $maxPage;
+                }
+
+                $prev = $currentPage - 1;
+                if ($currentPage > 1) {
+                    echo "  <button><a href='?page=$prev&search=".urlencode($search)."&search_name=$search_name&sort=$sort'><i class='fa fa-chevron-left' aria-hidden='true'></i></a></button>
+                            ";
+                } else {
+                    echo "  <button style='color: gray; cursor: not-allowed;' disabled><i class='fa fa-chevron-left' aria-hidden='true'></i></button>
+                            ";
+                }
+
+                for ($i=1; $i <= $maxPage; $i++){
+                            
+                                        if ($currentPage == $i) {
+                                            echo "  <a  href='?page=$i&search=".urlencode($search)."&search_name=$search_name&sort=$sort' style='color: red; cursor: not-allowed;'>$i</a>
+                                                    ";
+                                        } else {
+                                            echo "   <a  href='?page=$i&search=".urlencode($search)."&search_name=$search_name&sort=$sort' style='color: green;'>$i </a>
+                                                    ";
+                                        }
+                                }
+                              
+
+                $next = $currentPage + 1;     
+                if ($currentPage < $maxPage) {
+                    echo "  <button><a href='?page=$next&search=".urlencode($search)."&search_name=$search_name&sort=$sort'><i class='fa fa-chevron-right' aria-hidden='true'></i></a></button>
+                            ";
+                } else {
+                    echo "  <button style='color: gray; cursor: not-allowed;' disabled><i class='fa fa-chevron-right' aria-hidden='true'></i></button>
+                            ";
+                }
+                // echo "  <p>$currentPage / $maxPage</p> ";
+
+                  ?>
+                
+            </div>
+
             <div class="container">
                 <table>
                     <thead>
