@@ -2,6 +2,13 @@
 require_once 'api/helpers/convertDate.php';
 
 function OutputClients($clients){
+    function convertParams($arr){
+        $params = [];
+        foreach ($arr as $key => $value) {
+            $params[] = "$key=$value";
+    }
+        return implode('&', $params);
+    }
     foreach($clients as $client){
         $id = $client['id'];
         $clients_name = $client['name'];
@@ -12,10 +19,16 @@ function OutputClients($clients){
 
         $birthday = convertDate($birthday);
         $created_at = convertDateTime($created_at);
+
+               
+        $copyParams = $_GET;
+        $copyParams['send-email'] = $email;
+        $queryParams = convertParams($copyParams);
+
         echo "<tr>
         <td>$id</td>
         <td>$clients_name</td>
-        <td>$email</td>
+        <td><a href='?$queryParams'>$email</a></td>
         <td>$phone</td>
         <td>$birthday</td>
         <td>$created_at</td>
