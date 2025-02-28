@@ -132,7 +132,7 @@ require_once 'api/helpers/selectDefaultValue.php';
                     $search = trim(strtolower($search));
                 
                     $orders = $db->query(
-                        "SELECT COUNT(*) as count
+                        "SELECT *
                         FROM orders 
                         JOIN clients ON orders.client_id = clients.id 
                         JOIN order_items ON orders.id = order_items.order_id 
@@ -141,9 +141,9 @@ require_once 'api/helpers/selectDefaultValue.php';
                         WHERE (LOWER(clients.name) LIKE '%$search%' OR LOWER(products.name) LIKE '%$search%') $status
                         GROUP BY orders.id, clients.name, orders.order_date, orders.total 
                         $sort
-                        ")->fetchAll()[0]['count'];
+                        ")->fetchAll();
                    
-                    return $orders;
+                    return count(array_keys($orders));
                 }
                 $totalOrders = CountSearch($_GET, $db);
                 $maxPage = ceil($totalOrders / $maxOrders);
@@ -155,34 +155,45 @@ require_once 'api/helpers/selectDefaultValue.php';
                     $currentPage = $maxPage;
                 }
 
-                $prev = $currentPage - 1;
-                if ($currentPage > 1) {
-                    echo "  <button><a href='?page=$prev&search=".urlencode($search)."&search_name=$search_name&sort=$sort&checkbox=$status'><i class='fa fa-chevron-left' aria-hidden='true'></i></a></button>
-                            ";
-                } else {
-                    echo "  <button style='color: gray; cursor: not-allowed;' disabled><i class='fa fa-chevron-left' aria-hidden='true'></i></button>
-                            ";
+
+                function paramsToString(array $params){
+                    $queryParams = [];
+                    foreach ($params as $key => $value){
+                        $queryParams[] = "$key=$value";
+                    }
+                    return implode('&', $queryParams);
                 }
 
-                for ($i=1; $i <= $maxPage; $i++){
-                            
-                                        if ($currentPage == $i) {
-                                            echo "  <a  href='?page=$i&search=".urlencode($search)."&search_name=$search_name&sort=$sort&checkbox=$status' style='color: red; cursor: not-allowed;'>$i</a>
-                                                    ";
-                                        } else {
-                                            echo "   <a  href='?page=$i&search=".urlencode($search)."&search_name=$search_name&sort=$sort&checkbox=$status' style='color: green;'>$i </a>
-                                                    ";
-                                        }
-                                }
-                              
+                $prev = $currentPage - 1;
+                if ($currentPage > 1) {
+                    $copyParams = $_GET;
+                    $copyParams['page'] = $prev;
+                    $prevQueryParams = paramsToString($copyParams);
+                    echo "<button><a href='?$prevQueryParams'><i class='fa fa-chevron-left' aria-hidden='true'></i></a></button>";
+                } else {
+                    echo "<button style='color: gray; cursor: not-allowed;' disabled><i class='fa fa-chevron-left' aria-hidden='true'></i></button>";
+                }
+
+                for ($i = 1; $i <= $maxPage; $i++) {
+                    $copyParams = $_GET;
+                    $copyParams['page'] = $i;
+                    $pageQueryParams = paramsToString($copyParams);
+                    
+                    if ($currentPage == $i) {
+                        echo "<a href='?$pageQueryParams' style='color: red; cursor: not-allowed;'>$i</a>";
+                    } else {
+                        echo "<a href='?$pageQueryParams' style='color: green;'>$i</a>";
+                    }
+                }
 
                 $next = $currentPage + 1;     
                 if ($currentPage < $maxPage) {
-                    echo "  <button><a href='?page=$next&search=".urlencode($search)."&search_name=$search_name&sort=$sort&checkbox=$status'><i class='fa fa-chevron-right' aria-hidden='true'></i></a></button>
-                            ";
+                    $copyParams = $_GET;
+                    $copyParams['page'] = $next;
+                    $nextQueryParams = paramsToString($copyParams);
+                    echo "<button><a href='?$nextQueryParams'><i class='fa fa-chevron-right' aria-hidden='true'></i></a></button>";
                 } else {
-                    echo "  <button style='color: gray; cursor: not-allowed;' disabled><i class='fa fa-chevron-right' aria-hidden='true'></i></button>
-                            ";
+                    echo "<button style='color: gray; cursor: not-allowed;' disabled><i class='fa fa-chevron-right' aria-hidden='true'></i></button>";
                 }
                 // echo "  <p>$currentPage / $maxPage</p> ";
 
