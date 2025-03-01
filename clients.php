@@ -349,8 +349,23 @@ require_once 'api/helpers/selectDefaultValue.php';
                 <main class="modal__content" id="modal-1-content">
                     <?php
                     if (isset($_GET['send-email']) && !empty($_GET['send-email'])) {
-                        echo $_GET['send-email'];
-                        
+                        echo '<form method="POST" action="api/clients/SendEmail.php?email=$email">
+                                <input type="hidden" name="email" value="'.$_GET['send-email'].'">
+                                
+                                <label for="header">Заголовок письма:</label>
+                                <input type="text" id="header" name="header" required>
+                                
+                                <label for="main">Основной текст:</label>
+                                <textarea id="main" name="main" rows="4" required style="border: 1px solid #ccc; border-radius: 4px; padding: 8px;"></textarea>
+                                
+                                <label for="footer">Подпись письма:</label>
+                                <input type="text" id="footer" name="footer" required>
+                                
+                                <div class="button-group">
+                                    <button type="submit" class="create">Отправить</button>
+                                    <button type="button" class="cancel" data-micromodal-close>Отмена</button>
+                                </div>
+                            </form>';
                     }
                     ?>
                 </main>
