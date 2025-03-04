@@ -101,5 +101,14 @@ $mail->Subject = 'Ильченко';
 $mail->CharSet = 'UTF-8';
 $mail->Body = $html;
 $mail->send();
+
+try {
+    $_SESSION['send-email-notification'] = 'Сообщение отправлено';
+} catch (Exception $error) {
+    $_SESSION['send-email-notification'] = 'Сообщение не отправлено';
+} finally {
+    header('location:../../clients.php');
+}
+
 ?>
 
