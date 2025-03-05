@@ -6,6 +6,7 @@ document.querySelectorAll('.open').forEach((modal)=>{
     const url = new URL(document.location);
     const searchParams = url.searchParams;
     searchParams.delete('send-email');
+    searchParams.delete('edit-user');
     window.history.pushState({}, '', url.toString());
         }
     });

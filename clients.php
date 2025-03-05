@@ -232,8 +232,13 @@ require_once 'api/helpers/selectDefaultValue.php';
         </div>
     </div>
 
-    <div class="modal micromodal-slide" id="edit-modal" aria-hidden="true">
+    <div class="modal micromodal-slide <?php
+        if (isset($_GET['edit-user']) && !empty($_GET['edit-user'])) {
+            echo 'open';
+        }
+        ?>"  id="edit-modal" aria-hidden="true">
         <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+
             <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
                 <header class="modal__header">
                     <h2 class="modal__title" id="modal-1-title">
@@ -242,18 +247,33 @@ require_once 'api/helpers/selectDefaultValue.php';
                     <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
                 </header>
                 <main class="modal__content" id="modal-1-content">
+<?php
+if (isset($_GET['edit-user']) && !empty($_GET['edit-user'])) {
+    $userId = $_GET['edit-user'];
+
+    $client = $db->query(
+        "SELECT * FROM clients WHERE id = $userId
+    ")->fetchAll()[0];
+
+    if ($client) {
+        $clientName = $client['name'];
+        $clientEmail = $client['email']; 
+        $clientPhone = $client['phone'];
+    }
+}
+?>
                     <form id="registration-form">
                         <label for="full-name">ФИО:</label>
-                        <input type="text" id="full-name" name="full-name" required>
+                        <input type="text" id="full-name" name="full-name" value="<?php echo $clientName; ?>">
 
                         <label for="email">Почта:</label>
-                        <input type="email" id="email" name="email" required>
+                        <input type="email" id="email" name="email" value="<?php echo $clientEmail; ?>">
 
                         <label for="phone">Телефон:</label>
-                        <input type="tel" id="phone" name="phone" required>
+                        <input type="tel" id="phone" name="phone" value="<?php echo $clientPhone; ?>">
 
                         <button class="create" type="submit">Редактировать</button>
-                        <button onclick="MicroModal.close('edit-modal')" class="cancel" type="button">Отмена</button>
+                        <button type="button" class="cancel" data-micromodal-close>Отмена</button>
                     </form>
                 </main>
             </div>
