@@ -336,3 +336,20 @@ main {
 .modal_form-group input:focus {
     border-color: #4CAF50;
 }
+.main-select {
+    width: calc(100% - 22px);
+    /* Учитываем отступы */
+    padding: 2px;
+    margin-top: 2px;
+    /* Отступ сверху поля ввода/выбора */
+    border-radius: 4px;
+    border: 1px solid #828282;
+    /* Граница поля ввода/выбора */
+}
+
+.main-select:focus {
+    border-color: #4CAF50;
+    /* Цвет границы при фокусе */
+    outline: none;
+    /* Убираем обводку при фокусе */
+}

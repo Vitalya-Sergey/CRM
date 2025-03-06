@@ -262,20 +262,26 @@ if (isset($_GET['edit-user']) && !empty($_GET['edit-user'])) {
     }
 }
 ?>
-                    <form id="registration-form">
-                        <label for="full-name">ФИО:</label>
-                        <input type="text" id="full-name" name="full-name" value="<?php echo $clientName; ?>">
 
-                        <label for="email">Почта:</label>
-                        <input type="email" id="email" name="email" value="<?php echo $clientEmail; ?>">
+<?php
+if (isset($_GET['edit-user']) && !empty($_GET['edit-user'])) {
+    echo " <form method='POST' action='api/clients/EditClients.php?id=$userId'>
+    <label for='full-name'>ФИО:</label>
+    <input type='text' id='full-name' name='full-name' value='$clientName'>
 
-                        <label for="phone">Телефон:</label>
-                        <input type="tel" id="phone" name="phone" value="<?php echo $clientPhone; ?>">
+    <label for='email'>Почта:</label>
+    <input type='email' id='email' name='email' value='$clientEmail'>
 
-                        <button class="create" type="submit">Редактировать</button>
-                        <button type="button" class="cancel" data-micromodal-close>Отмена</button>
-                    </form>
-                </main>
+    <label for='phone'>Телефон:</label>
+    <input type='tel' id='phone' name='phone' value='$clientPhone'>
+
+    <button class='create' type='submit'>Редактировать</button>
+    <button type='button' class='cancel' data-micromodal-close>Отмена</button>
+</form>";
+}
+?>
+                    
+            </main>
             </div>
         </div>
     </div>

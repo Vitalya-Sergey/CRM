@@ -129,15 +129,15 @@ require_once 'api/helpers/selectDefaultValue.php';
 
                 for ($i=1; $i <= $maxPage; $i++){
                             
-                                        if ($currentPage == $i) {
-                                            echo "  <a  href='?page=$i&search=".urlencode($search)."&search_name=$search_name&sort=$sort' style='color: red; cursor: not-allowed;'>$i</a>
-                                                    ";
-                                        } else {
-                                            echo "   <a  href='?page=$i&search=".urlencode($search)."&search_name=$search_name&sort=$sort' style='color: green;'>$i </a>
-                                                    ";
-                                        }
-                                }
-                              
+                        if ($currentPage == $i) {
+                            echo "  <a  href='?page=$i&search=".urlencode($search)."&search_name=$search_name&sort=$sort' style='color: red; cursor: not-allowed;'>$i</a>
+                                    ";
+                        } else {
+                            echo "   <a  href='?page=$i&search=".urlencode($search)."&search_name=$search_name&sort=$sort' style='color: green;'>$i </a>
+                                    ";
+                        }
+                }
+                
 
                 $next = $currentPage + 1;     
                 if ($currentPage < $maxPage) {
@@ -222,7 +222,11 @@ require_once 'api/helpers/selectDefaultValue.php';
         </div>
     </div>
 
-    <div class="modal micromodal-slide" id="edit-modal" aria-hidden="true">
+    <div class="modal micromodal-slide <?php
+        if (isset($_GET['edit-product']) && !empty($_GET['edit-product'])) {
+            echo 'open';
+        }
+        ?>" id="edit-modal" aria-hidden="true">
         <div class="modal__overlay" tabindex="-1" data-micromodal-close>
             <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
                 <header class="modal__header">
@@ -232,22 +236,42 @@ require_once 'api/helpers/selectDefaultValue.php';
                     <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
                 </header>
                 <main class="modal__content" id="modal-1-content">
-                    <form id="registration-form">
-                        <label for="name">Название:</label>
-                        <input type="text" id="name" name="name" required>
+                <?php
+                        if (isset($_GET['edit-product']) && !empty($_GET['edit-product'])) {
+                            $productId = $_GET['edit-product'];
 
-                        <label for="desc">Описание:</label>
-                        <input type="desc" id="desc" name="desc" required>
+                            $product = $db->query(
+                                "SELECT * FROM products WHERE id = $productId
+                            ")->fetchAll()[0];
 
-                        <label for="price">Цена:</label>
-                        <input type="price" id="price" name="price" required>
+                            if ($product) {
+                                $productName = $product['name'];
+                                $productDesc = $product['description']; 
+                                $productPrice = $product['price'];
+                                $productStock = $product['stock'];
+                            }
+                        }
+                        ?>
+                        <?php
+if (isset($_GET['edit-product']) && !empty($_GET['edit-product'])) {
+    echo "<form method='POST' action='api/products/EditProducts.php?id=$productId'>
+                        <label for='name'>Название:</label>
+                        <input type='text' id='name' name='name' value='$productName'>
 
-                        <label for="stock">Количество:</label>
-                        <input type="stock" id="stock" name="stock" required>
+                        <label for='desc'>Описание:</label>
+                        <input type='desc' id='desc' name='desc' value='$productDesc'>
 
-                        <button class="create" type="submit">Редактировать</button>
-                        <button onclick="MicroModal.close('edit-modal')" class="cancel" type="button">Отмена</button>
-                    </form>
+                        <label for='price'>Цена:</label>
+                        <input type='price' id='price' name='price' value='$productPrice'>
+
+                        <label for='stock'>Количество:</label>
+                        <input type='stock' id='stock' name='stock' value='$productStock'>
+
+                        <button class='create' type='submit'>Редактировать</button>
+                        <button type='button' class='cancel' data-micromodal-close>Отмена</button>
+                    </form>";
+                }
+                ?>
                 </main>
             </div>
         </div>

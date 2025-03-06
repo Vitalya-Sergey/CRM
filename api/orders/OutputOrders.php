@@ -30,7 +30,7 @@ function OutputOrders($orders){
         <td>$product_names</td>
         <td>$admin_name</td>
         <td>$status</td>
-        <td onclick='MicroModal.show(\"edit-modal\")'><i class='fa fa-pencil' aria-hidden='true'></i></td>
+        <td><a href='?edit-order=$id'><i class='fa fa-pencil' aria-hidden='true'></i></a></td>
         <td><a href='api/orders/DeleteOrder.php?id=$id'><i class='fa fa-trash' aria-hidden='true'></i></a></td>
         <td><a href='api/orders/generateCheack.php?id=$id'><i class='fa fa-qrcode' aria-hidden='true'></i></a></td>
         <td onclick='MicroModal.show(\"history-modal\")'><i class='fa fa-info-circle' aria-hidden='true'></i></td>

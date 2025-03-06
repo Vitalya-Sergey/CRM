@@ -283,7 +283,11 @@ require_once 'api/helpers/selectDefaultValue.php';
         </div>
     </div>
 
-    <div class="modal micromodal-slide" id="edit-modal" aria-hidden="true">
+    <div class="modal micromodal-slide <?php
+        if (isset($_GET['edit-order']) && !empty($_GET['edit-order'])) {
+            echo 'open';
+        }
+        ?>" id="edit-modal" aria-hidden="true">
         <div class="modal__overlay" tabindex="-1" data-micromodal-close>
             <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
                 <header class="modal__header">
@@ -293,22 +297,27 @@ require_once 'api/helpers/selectDefaultValue.php';
                     <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
                 </header>
                 <main class="modal__content" id="modal-1-content">
-                    <form id="registration-form">
-                        <label for="name">Название:</label>
-                        <input type="text" id="name" name="name" required>
+                <?php
+                if (isset($_GET['edit-order']) && !empty($_GET['edit-order'])) {
+                    $orderId = $_GET['edit-order'];
 
-                        <label for="data">Дата заказа:</label>
-                        <input type="data" id="data" name="data" required>
+                    $order = $db->query("SELECT * FROM orders WHERE id = $orderId")->fetchAll()[0];
+                    $status = $order['status'];}
+                ?>  
+                <?php
+                if (isset($_GET['edit-order']) && !empty($_GET['edit-order'])) {
+                    echo "<form method='POST' action='api/orders/EditOrders.php?id=$orderId'>
+                        <label for='status'>Статус:</label>
+                        <select class='main-select' name='status' id='status'>
+                            <option value='0' " . ($status == 0 ? 'selected' : '') . ">Не активен</option>
+                            <option value='1' " . ($status == 1 ? 'selected' : '') . ">Активен</option>
+                        </select>
 
-                        <label for="price">Цена:</label>
-                        <input type="price" id="price" name="price" required>
-
-                        <label for="stock">Количество:</label>
-                        <input type="stock" id="stock" name="stock" required>
-
-                        <button class="create" type="submit">Редактировать</button>
-                        <button onclick="MicroModal.close('edit-modal')" class="cancel" type="button">Отмена</button>
-                    </form>
+                        <button class='create' type='submit'>Редактировать</button>
+                        <button type='button' class='cancel' data-micromodal-close>Отмена</button>
+                    </form>";
+                }
+                ?>
                 </main>
             </div>
         </div>
