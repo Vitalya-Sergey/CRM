@@ -229,6 +229,116 @@ main {
     background-color: #f1f1f1; /* Цвет фона строки при наведении */
 }
 
+.support-btn{
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+}
+.support-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 999;
+    transition: all 0.3s ease;
+}
+
+.support-button:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+/* Support Form */
+.support-create-tickets {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 350px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    padding: 20px;
+    display: none;
+    z-index: 1000;
+}
+
+.support-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.support-header h3 {
+    margin: 0;
+    color: #333;
+}
+
+.close-button {
+    cursor: pointer;
+    font-size: 24px;
+    color: #666;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.support-create-tickets label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.support-create-tickets select,
+.support-create-tickets textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.support-create-tickets textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+.file-label {
+    display: inline-block;
+    padding: 8px 12px;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.support-create-tickets input[type="file"] {
+    display: none;
+}
+
+.support-create-tickets button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.support-create-tickets button:hover {
+    background-color: #45a049;
+}
 
 @media (max-width: 1400px ){
     .clients_add{

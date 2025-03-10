@@ -109,6 +109,5 @@ try {
 } finally {
     header('location:../../clients.php');
 }
-
 ?>
 

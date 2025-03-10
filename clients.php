@@ -400,8 +400,68 @@ if (isset($_GET['edit-user']) && !empty($_GET['edit-user'])) {
     </div>
 
 
-    <script defer src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
-    <script defer src="scripts/initClientsModal.js"></script>
+
+<div class="support-button" onclick="toggleSupportForm()">
+    <i class="fa fa-question-circle"></i>
+    Поддержка
+</div>
+
+<div class="support-create-tickets" id="supportForm">
+    <div class="support-header">
+        <h3>Создать тикет</h3>
+        <span class="close-button" onclick="toggleSupportForm()">&times;</span>
+    </div>
+    <form action="api/tickets/CreateTicket.php" method="POST">
+        <div class="form-group">
+            <label for="type">Тип обращения</label>
+            <select name="type" id="type">
+                <option value="tech">Техническая неполадка</option>
+                <option value="crm">Проблема с CRM</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="message">Текст обращения</label>  
+            <textarea name="message" id="message" placeholder="Опишите вашу проблему..."></textarea>
+        </div>
+        <div class="form-group">
+            <label for="files" class="file-label">
+                <i class="fa fa-paperclip"></i> Прикрепить файл
+            </label>
+            <input type="file" name="files" id="files">
+        </div>
+        <button type="submit">Создать тикет</button>
+    </form>
+</div>
+
+
+<?php
+if (isset($_SESSION['token'])) {
+    $userIdQuery = $db->prepare("SELECT id FROM users WHERE token = :token");
+    $userIdQuery->execute(['token' => $_SESSION['token']]);
+    $user = $userIdQuery->fetch();
+    if ($user) {
+        $_SESSION['user_id'] = $user['id'];
+    }
+}
+?>
+
+
+<script>
+function toggleSupportForm() {
+    const form = document.getElementById('supportForm');
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+    } else {
+        form.style.display = 'none';
+    }
+}
+
+</script>
+
+<script defer src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
+<script defer src="scripts/initClientsModal.js"></script>
+
+
 </body>
 
 </html>
