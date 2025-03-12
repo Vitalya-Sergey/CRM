@@ -12,7 +12,6 @@ AuthCheck('', 'login.php');
 require_once 'api/helpers/inputDefaultValue.php';
 require_once 'api/helpers/selectDefaultValue.php';
 
-
 ?>
 
 
@@ -43,6 +42,15 @@ require_once 'api/helpers/selectDefaultValue.php';
                 <li><a href="clients.php">Клиенты</a></li>
                 <li><a href="products.php">Товары</a></li>
                 <li><a href="orders.php">Заказы</a></li>
+                <?php
+                require_once 'api/helpers/getUserType.php';
+                    $userType = getUserType($db);
+                if ($userType == 'tech') {
+                    echo'
+                    <li><a href="tech.php">Обращения пользоваетеля</a></li>
+                    ';
+                }
+                ?>
             </ul>
             <a class="header_login" href="?do=logout">Выйти <i class="fa fa-sign-out" aria-hidden="true"></i>
             </a>
