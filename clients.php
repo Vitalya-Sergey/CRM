@@ -47,7 +47,7 @@ require_once 'api/helpers/selectDefaultValue.php';
                     $userType = getUserType($db);
                 if ($userType == 'tech') {
                     echo'
-                    <li><a href="tech.php">Обращения пользоваетеля</a></li>
+                    <li><a href="tech.php">Обращения пользователя</a></li>
                     ';
                 }
                 ?>

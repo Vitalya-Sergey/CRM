@@ -1,0 +1,329 @@
+.page-title {
+    color: #333;
+    margin: 2rem 0;
+    text-align: center;
+    font-size: 2rem;
+}
+.main {
+    padding: 0 0 2rem 0;
+}
+.tickets-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2rem auto;
+    max-width: 1200px;
+    width: 100%;
+}
+.tickets-wrapper {
+    overflow: hidden;
+    margin: 0 50px;
+}
+.tickets-grid {
+    display: flex;
+    gap: 1.5rem;
+    transition: transform 0.3s ease;
+}
+.ticket-card {
+    flex: 0 0 calc(33.333% - 1rem);
+    min-width: 300px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem;
+}
+.scroll-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+.scroll-button:hover {
+    background: #f5f5f5;
+}
+.scroll-button.left {
+    left: 0;
+}
+.scroll-button.right {
+    right: 0;
+}
+.ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+}
+.ticket-id {
+    font-weight: bold;
+    color: #333;
+}
+.ticket-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+.status-waiting {
+    background: #fff3cd;
+    color: #856404;
+}
+.status-in-progress {
+    background: #cce5ff;
+    color: #004085;
+}
+.status-completed {
+    background: #d4edda;
+    color: #155724;
+}
+.ticket-body p {
+    margin: 0.5rem 0;
+    line-height: 1.4;
+}
+.ticket-message {
+    color: #666;
+    margin: 1rem 0;
+}
+h1 {
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+.ticket-actions {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+.btn-accept, .btn-complete {
+    width: 100%;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+.btn-accept {
+    background: #007bff;
+    color: white;
+}
+.btn-accept:hover {
+    background: #0056b3;
+}
+.btn-complete {
+    background: #28a745;
+    color: white;
+}
+.btn-complete:hover {
+    background: #218838;
+}
+.alert {
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 4px;
+    background: #d4edda;
+    color: #155724;
+    text-align: center;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+}
+.modal.is-open {
+    display: block;
+}
+.modal__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.modal__container {
+    background-color: #fff;
+    padding: 30px;
+    max-width: 500px;
+    max-height: 100vh;
+    border-radius: 4px;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+.modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.modal__title {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.25rem;
+    line-height: 1.25;
+    color: #333;
+    box-sizing: border-box;
+}
+.modal__close {
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    position: relative;
+}
+.modal__close:before,
+.modal__close:after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 24px;
+    background: #333;
+    top: 0;
+    left: 50%;
+}
+.modal__close:before {
+    transform: rotate(45deg);
+}
+.modal__close:after {
+    transform: rotate(-45deg);
+}
+.modal__content {
+    margin-bottom: 20px;
+    line-height: 1.5;
+    color: rgba(0,0,0,.8);
+}
+.modal__btn {
+    font-size: .875rem;
+    padding: 0.5rem 1rem;
+    background-color: #e6e6e6;
+    color: rgba(0,0,0,.8);
+    border-radius: 0.25rem;
+    border: 0;
+    cursor: pointer;
+    line-height: 1;
+}
+.modal__btn:hover {
+    background-color: #d4d4d4;
+}
+
+/* Animation */
+.micromodal-slide {
+    display: none;
+}
+.micromodal-slide.is-open {
+    display: block;
+}
+.micromodal-slide[aria-hidden="false"] .modal__overlay {
+    animation: mmfadeIn .3s cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+.micromodal-slide[aria-hidden="false"] .modal__container {
+    animation: mmslideIn .3s cubic-bezier(0, 0, .2, 1);
+}
+.micromodal-slide[aria-hidden="true"] .modal__overlay {
+    animation: mmfadeOut .3s cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+.micromodal-slide[aria-hidden="true"] .modal__container {
+    animation: mmslideOut .3s cubic-bezier(0, 0, .2, 1);
+}
+.micromodal-slide .modal__container,
+.micromodal-slide .modal__overlay {
+    will-change: transform;
+}
+@keyframes mmfadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes mmfadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+@keyframes mmslideIn {
+    from { transform: translateY(15%); }
+    to { transform: translateY(0); }
+}
+@keyframes mmslideOut {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10%); }
+}
+
+.controls-wrapper {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.filter-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.filter-select,
+.sort-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.3s;
+    min-width: 150px;
+}
+
+.filter-select:hover,
+.sort-select:hover {
+    border-color: #007bff;
+}
+
+.filter-select:focus,
+.sort-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+
+.ticket-filters {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ticket-filters select {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fff;
+    cursor: pointer;
+    width: 200px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.ticket-filters select:hover {
+    border-color: #007bff;
+}
+
+.ticket-filters select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}

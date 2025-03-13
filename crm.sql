@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1
--- Время создания: Мар 10 2025 г., 05:44
--- Версия сервера: 10.4.32-MariaDB
--- Версия PHP: 8.2.12
+-- Время создания: Мар 13 2025 г., 09:03
+-- Версия сервера: 10.4.28-MariaDB
+-- Версия PHP: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -183,16 +183,19 @@ CREATE TABLE `tickets` (
   `message` varchar(256) DEFAULT NULL,
   `client` int(11) NOT NULL,
   `admin` int(11) DEFAULT NULL,
-  `create_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` enum('Ожидает','В работе','Выполнено') NOT NULL DEFAULT 'Ожидает'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Дамп данных таблицы `tickets`
 --
 
-INSERT INTO `tickets` (`id`, `type`, `message`, `client`, `admin`, `create_at`) VALUES
-(1, 'tech', 'проблема', 2, 1, '2025-03-10 04:04:44'),
-(2, 'crm', 'ОНА НЕ РАБОТАЕТ ААААААА', 3, 1, '2025-03-10 04:05:50');
+INSERT INTO `tickets` (`id`, `type`, `message`, `client`, `admin`, `create_at`, `status`) VALUES
+(1, 'tech', 'проблема', 1, 2, '2025-03-10 04:04:44', 'Ожидает'),
+(2, 'crm', 'ОНА НЕ РАБОТАЕТ ААААААА', 3, 2, '2025-03-10 04:05:50', 'Ожидает'),
+(3, 'tech', 'виталя лох', 1, NULL, '2025-03-13 07:54:48', 'Ожидает'),
+(4, 'tech', 'gfhgfh', 2, NULL, '2025-03-13 07:55:29', 'Ожидает');
 
 -- --------------------------------------------------------
 
@@ -220,17 +223,18 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `surname` varchar(256) NOT NULL,
-  `token` varchar(256) DEFAULT NULL
+  `token` varchar(256) DEFAULT NULL,
+  `type` enum('admin','tech') NOT NULL DEFAULT 'admin'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Дамп данных таблицы `users`
 --
 
-INSERT INTO `users` (`id`, `login`, `password`, `name`, `surname`, `token`) VALUES
-(1, 'admin', 'admin123', 'Administrator', 'kitchen', 'bG9naW49J2FkbWluJyZwYXNzd29yZD0nYWRtaW4xMjMnJnVuaXF1ZT0xNzQxNTc1OTIy'),
-(2, 'manager', 'manager456', 'Manager', '', ''),
-(3, 'sales', 'sales789', 'Sales Representative', '', '');
+INSERT INTO `users` (`id`, `login`, `password`, `name`, `surname`, `token`, `type`) VALUES
+(1, 'admin', 'admin123', 'Administrator', 'kitchen', NULL, 'admin'),
+(2, 'manager', '456', 'Manager', '', 'bG9naW49J21hbmFnZXInJnBhc3N3b3JkPSc0NTYnJnVuaXF1ZT0xNzQxODUyNTA5', 'tech'),
+(3, 'sales', 'sales789', 'Sales Representative', '', '', 'admin');
 
 --
 -- Индексы сохранённых таблиц
@@ -316,7 +320,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT для таблицы `tickets`
 --
 ALTER TABLE `tickets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `tickets_message`
