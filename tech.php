@@ -220,11 +220,16 @@ if ($userType !== 'tech') {
                                         <button type='submit' class='btn-accept'>Принять в работу</button>
                                     </form>";
                             } elseif ($status === 'В работе' && $ticket['admin'] == $_SESSION['user_id']) {
-                                echo "<form class='ticket-form' onsubmit='handleTicketAction(event, this)'>
-                                        <input type='hidden' name='ticket_id' value='" . $ticket['id'] . "'>
-                                        <input type='hidden' name='action' value='complete'>
-                                        <button type='submit' class='btn-complete'>Завершить</button>
-                                    </form>";
+                                echo "<div class='ticket-buttons'>
+                                        <form class='ticket-form' onsubmit='handleTicketAction(event, this)'>
+                                            <input type='hidden' name='ticket_id' value='" . $ticket['id'] . "'>
+                                            <input type='hidden' name='action' value='complete'>
+                                            <button type='submit' class='btn-complete'>Завершить</button>
+                                        </form>
+                                        <button onclick='openChat(" . $ticket['id'] . ")' class='btn-chat' title='Открыть чат'>
+                                            <i class='fa fa-comments'></i>
+                                        </button>
+                                    </div>";
                             }
                             echo "</div>
                                 </div>
@@ -239,6 +244,29 @@ if ($userType !== 'tech') {
             </div>
         </div>
     </main>
+
+    <!-- Модальное окно чата -->
+    <div class="modal micromodal-slide" id="chat-modal" aria-hidden="true">
+        <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+            <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+                <header class="modal__header">
+                    <h2 class="modal__title">Чат обращения #<span id="chat-ticket-id"></span></h2>
+                    <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+                </header>
+                <main class="modal__content">
+                    <div class="chat-messages" id="chat-messages">
+                        <!-- Messages will be loaded here -->
+                    </div>
+                    <form id="chat-form" class="chat-form">
+                        <input type="text" id="chat-input" placeholder="Введите сообщение...">
+                        <button type="submit" class="send-message">
+                            <i class="fa fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </main>
+            </div>
+        </div>
+    </div>
 
     <script src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
     <script>
@@ -267,6 +295,44 @@ if ($userType !== 'tech') {
         function showNotification(message) {
             document.getElementById('notification-modal-content').textContent = message;
             MicroModal.show('notification-modal');
+        }
+
+        // Функции для работы с чатом
+        function openChat(ticketId) {
+            // Prevent modal close
+            event.stopPropagation();
+            
+            // Update URL with ticket ID
+            const url = new URL(window.location.href);
+            url.searchParams.set('msg', ticketId);
+            window.history.pushState({}, '', url);
+            
+            // Set ticket ID in chat modal
+            document.getElementById('chat-ticket-id').textContent = ticketId;
+            
+            // Load messages
+            loadChatMessages(ticketId);
+            
+            // Show chat modal
+            MicroModal.show('chat-modal');
+        }
+
+        function loadChatMessages(ticketId) {
+            fetch(`api/tickets/GetTicketMessages.php?ticket_id=${ticketId}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('chat-messages').innerHTML = html;
+                    scrollToBottom();
+                })
+                .catch(error => {
+                    console.error('Error loading messages:', error);
+                    document.getElementById('chat-messages').innerHTML = '<p>Ошибка при загрузке сообщений</p>';
+                });
+        }
+
+        function scrollToBottom() {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         // Обработка действий с тикетами
@@ -298,11 +364,16 @@ if ($userType !== 'tech') {
                         statusSpan.className = 'ticket-status status-in-progress';
                         statusSpan.textContent = 'В работе';
                         actionsDiv.innerHTML = `
-                            <form class='ticket-form' onsubmit='handleTicketAction(event, this)'>
-                                <input type='hidden' name='ticket_id' value='${formData.get('ticket_id')}'>
-                                <input type='hidden' name='action' value='complete'>
-                                <button type='submit' class='btn-complete'>Завершить</button>
-                            </form>`;
+                            <div class="ticket-buttons">
+                                <form class='ticket-form' onsubmit='handleTicketAction(event, this)'>
+                                    <input type='hidden' name='ticket_id' value='${formData.get('ticket_id')}'>
+                                    <input type='hidden' name='action' value='complete'>
+                                    <button type='submit' class='btn-complete'>Завершить</button>
+                                </form>
+                                <button onclick='openChat(${formData.get('ticket_id')})' class='btn-chat' title="Открыть чат">
+                                    <i class="fa fa-comments"></i>
+                                </button>
+                            </div>`;
                     } else if (formData.get('action') === 'complete') {
                         statusSpan.className = 'ticket-status status-completed';
                         statusSpan.textContent = 'Выполнено';
@@ -315,6 +386,40 @@ if ($userType !== 'tech') {
                 showNotification('Произошла ошибка при обработке запроса');
             }
         }
+
+        // Обработка отправки сообщений в чате
+        document.getElementById('chat-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            const ticketId = document.getElementById('chat-ticket-id').textContent;
+            
+            if (message) {
+                fetch('api/tickets/SendMessage.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `ticket_id=${ticketId}&message=${encodeURIComponent(message)}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        input.value = '';
+                        loadChatMessages(ticketId);
+                    }
+                });
+            }
+        });
+
+        // Auto-load chat if msg parameter exists
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const msgParam = urlParams.get('msg');
+            if (msgParam) {
+                openChat(msgParam);
+            }
+        });
 
         function scrollTickets(direction) {
             const wrapper = document.querySelector('.tickets-grid');

@@ -438,9 +438,46 @@ if (isset($_GET['edit-user']) && !empty($_GET['edit-user'])) {
             <input type="file" name="files" id="files">
         </div>
         <button type="submit">Создать тикет</button>
+        <button type="button" class="my-tickets-btn" onclick="showTickets()">Мои обращения</button>
     </form>
 </div>
 
+<!-- Модальное окно для списка обращений -->
+<div class="modal micromodal-slide" id="tickets-list-modal" aria-hidden="true">
+    <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+        <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+            <header class="modal__header">
+                <h2 class="modal__title">Мои обращения</h2>
+                <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+            </header>
+            <main class="modal__content" id="tickets-list-content">
+                <!-- Здесь будет список обращений -->
+            </main>
+        </div>
+    </div>
+</div>
+
+<div class="modal micromodal-slide" id="chat-modal" aria-hidden="true">
+    <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+        <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+            <header class="modal__header">
+                <h2 class="modal__title">Чат обращения #<span id="chat-ticket-id"></span></h2>
+                <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+            </header>
+            <main class="modal__content">
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Messages will be loaded here -->
+                </div>
+                <form id="chat-form" class="chat-form">
+                    <input type="text" id="chat-input" placeholder="Введите сообщение...">
+                    <button type="submit" class="send-message">
+                        <i class="fa fa-paper-plane"></i>
+                    </button>
+                </form>
+            </main>
+        </div>
+    </div>
+</div>
 
 <?php
 if (isset($_SESSION['token'])) {
@@ -464,11 +501,104 @@ function toggleSupportForm() {
     }
 }
 
+function showTickets(page = 1) {
+    fetch(`api/tickets/GetUserTickets.php?page=${page}`)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('tickets-list-content').innerHTML = html;
+            MicroModal.show('tickets-list-modal');
+        })
+        .catch(error => {
+            console.error('Ошибка при загрузке тикетов:', error);
+            document.getElementById('tickets-list-content').innerHTML = '<p>Произошла ошибка при загрузке тикетов</p>';
+        });
+}
+
+function openChat(ticketId) {
+    // Prevent modal close
+    event.stopPropagation();
+    
+    // Update URL with ticket ID
+    const url = new URL(window.location.href);
+    url.searchParams.set('msg', ticketId);
+    window.history.pushState({}, '', url);
+    
+    // Set ticket ID in chat modal
+    document.getElementById('chat-ticket-id').textContent = ticketId;
+    
+    // Load messages
+    loadChatMessages(ticketId);
+    
+    // Show chat modal
+    MicroModal.show('chat-modal');
+}
+
+function loadChatMessages(ticketId) {
+    fetch(`api/tickets/GetTicketMessages.php?ticket_id=${ticketId}`)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('chat-messages').innerHTML = html;
+            scrollToBottom();
+        })
+        .catch(error => {
+            console.error('Error loading messages:', error);
+            document.getElementById('chat-messages').innerHTML = '<p>Ошибка при загрузке сообщений</p>';
+        });
+}
+
+function scrollToBottom() {
+    const chatMessages = document.getElementById('chat-messages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Handle message submission
+document.getElementById('chat-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    const ticketId = document.getElementById('chat-ticket-id').textContent;
+    
+    if (message) {
+        fetch('api/tickets/SendMessage.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `ticket_id=${ticketId}&message=${encodeURIComponent(message)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                input.value = '';
+                loadChatMessages(ticketId);
+            }
+        });
+    }
+});
+
+// Auto-load chat if msg parameter exists
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const msgParam = urlParams.get('msg');
+    if (msgParam) {
+        openChat(msgParam);
+    }
+    
+    // Initialize MicroModal
+    MicroModal.init({
+        onClose: modal => {
+            // Clear content when closing tickets list modal
+            if (modal.id === 'tickets-list-modal') {
+                document.getElementById('tickets-list-content').innerHTML = '';
+            }
+        }
+    });
+});
+
 </script>
 
 <script defer src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
 <script defer src="scripts/initClientsModal.js"></script>
-
 
 </body>
 

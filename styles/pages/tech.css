@@ -105,8 +105,36 @@ h1 {
     padding-top: 1rem;
     border-top: 1px solid #eee;
 }
+.ticket-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.ticket-buttons .ticket-form {
+    flex: 1;
+}
+.btn-chat {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background-color: #2196F3;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+.btn-chat:hover {
+    background-color: #1976D2;
+}
+.btn-chat i {
+    font-size: 18px;
+}
 .btn-accept, .btn-complete {
-    width: 100%;
+    flex: 1;
     padding: 0.5rem;
     border: none;
     border-radius: 4px;
@@ -326,4 +354,109 @@ h1 {
 .ticket-filters select:focus {
     border-color: #007bff;
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Стили для чата */
+.chat-messages {
+    height: 400px;
+    overflow-y: auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.chat-message {
+    margin-bottom: 15px;
+    max-width: 80%;
+}
+
+.chat-message.sent {
+    margin-left: auto;
+}
+
+.chat-message.received {
+    margin-right: auto;
+}
+
+.message-content {
+    padding: 10px 15px;
+    border-radius: 10px;
+    word-wrap: break-word;
+}
+
+.sent .message-content {
+    background-color: #2196F3;
+    color: white;
+}
+
+.received .message-content {
+    background-color: white;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.message-time {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.message-sender {
+    font-weight: bold;
+}
+
+.chat-form {
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+    background-color: white;
+    border-top: 1px solid #ddd;
+}
+
+#chat-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.send-message {
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.send-message:hover {
+    background-color: #1976D2;
+}
+
+.no-messages {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+}
+
+/* Адаптивные стили для чата */
+@media (max-width: 768px) {
+    .chat-messages {
+        height: 300px;
+    }
+
+    .chat-message {
+        max-width: 90%;
+    }
+
+    .chat-form {
+        padding: 10px;
+    }
+
+    #chat-input {
+        font-size: 16px; /* Более удобный размер для мобильных устройств */
+    }
 }
