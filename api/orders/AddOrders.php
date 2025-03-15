@@ -54,25 +54,60 @@ if ($_SERVER['REQUEST_METHOD']==='POST'){
         'admin' => $adminID
     ];
 
+    $promo = $_POST['promo'];
+    $promoInfo = [];
+    $promoId = null;
+
+    if (!empty($promo)) {
+        $promoInfo = $db->query("
+            SELECT * FROM promotions 
+            WHERE code_promo = '$promo'
+        ") ->fetchAll();
+        // Проверяем существование промокода
+        if (!$promoInfo) {
+            $_SESSION['orders-errors'] = 'Промокод не существует';
+            header('Location: ../../orders.php');
+            exit;
+        }
+        // Проверяем срок действия и количество использований
+        if ($promoInfo[0]['uses'] >= $promoInfo[0]['max_uses'] || strtotime($promoInfo[0]['cancel_at']) < strtotime('today')) {
+            $_SESSION['orders-errors'] = 'Акция закончена';
+            header('Location: ../../orders.php');
+            exit;
+        }
+        
+        $promoId = $promoInfo[0]['id'];
+    }
 
     $db->prepare(
-        "INSERT INTO `orders` (`id`, `client_id`, `total`, `admin`) VALUES (?, ?, ?, ?)"
+        "INSERT INTO `orders` (`client_id`, `admin`, `total`, `promotions`) VALUES (?, ?, ?, ?)"
     )->execute([
-        $orders['id'],
-        $orders['client_id'], 
-        $orders['total'],
-        $orders['admin']
+        $clientID,
+        $adminID,
+        $total,
+        $promoId
     ]);
-    // записать элементы заказа в orders_items order_id, product_id, quantity=1, price=цена продукта
+
+    // Получаем ID только что созданного заказа
+    $orderId = $db->lastInsertId();
+
+    // Добавляем товары в заказ
     foreach ($formData['products'] as $key => $product) {
         $db->prepare(
             "INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`) VALUES (?, ?, ?, ?)"
         )->execute([
-            $orders['id'],
+            $orderId, // Используем полученный ID заказа
             $product,
             1,
             $db->query("SELECT price FROM products WHERE id = $product")->fetchColumn(),
         ]);
+    }
+
+    // Если был использован промокод, увеличиваем счетчик использований
+    if ($promoId) {
+        $db->prepare(
+            "UPDATE promotions SET uses = uses + 1 WHERE id = ?"
+        )->execute([$promoId]);
     }
 
     header('Location: ../../orders.php');

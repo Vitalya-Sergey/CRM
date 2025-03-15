@@ -273,7 +273,9 @@ require_once 'api/helpers/selectDefaultValue.php';
                                 echo "<option value='$id'>$name : $price\$ : $stock шт.</option>";
                             }
                             ?>
-                            </select></div>
+                            </select>
+                            <label for="promo">Промокод:</label>
+                            <input type="text" id="promo" name="promo" >
 
                         <button class="create" type="submit">Создать</button>
                         <button onclick="MicroModal.close('add-modal')" class="cancel" type="button">Отмена</button>

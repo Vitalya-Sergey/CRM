@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1
--- Время создания: Мар 13 2025 г., 09:03
--- Версия сервера: 10.4.28-MariaDB
--- Версия PHP: 8.2.4
+-- Время создания: Мар 15 2025 г., 04:57
+-- Версия сервера: 10.4.32-MariaDB
+-- Версия PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -61,33 +61,37 @@ CREATE TABLE `orders` (
   `order_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `total` decimal(10,2) DEFAULT NULL,
   `status` enum('1','0') DEFAULT '1',
-  `admin` int(255) DEFAULT NULL
+  `admin` int(255) DEFAULT NULL,
+  `promotions` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Дамп данных таблицы `orders`
 --
 
-INSERT INTO `orders` (`id`, `client_id`, `order_date`, `total`, `status`, `admin`) VALUES
-(3, 1, '2025-01-13 09:25:36', 200.00, '0', 1),
-(5, 2, '2025-01-14 03:15:45', 300.00, '0', 1),
-(1738732062, 6, '2025-02-05 05:07:42', 1600.00, '1', 1),
-(1738732563, 3, '2025-02-05 05:16:03', 250.50, '0', 1),
-(1738732643, 2, '2025-02-05 05:17:23', 500.00, '0', 1),
-(1738732738, 6, '2025-02-05 05:18:58', 500.00, '0', 1),
-(1738818886, 3, '2025-02-06 05:14:46', 623.00, '1', 1),
-(1738818896, 2, '2025-02-06 05:14:56', 1750.50, '1', 1),
-(1738895546, 1738895546, '2025-02-07 02:32:26', 250.50, '1', 1),
-(1739250762, 2, '2025-02-11 05:12:42', 1750.50, '1', 1),
-(1739423871, 2, '2025-02-13 05:17:51', 2123.00, '0', 2),
-(1739424654, 1738895546, '2025-02-13 05:30:54', 2123.00, '0', 2),
-(1739424731, 1738895546, '2025-02-13 05:32:11', 250.50, '0', 2),
-(1739424751, 6, '2025-02-13 05:32:31', 2123.00, '0', 3),
-(1739425148, 6, '2025-02-13 05:39:08', 1500.00, '1', 3),
-(1739426074, 6, '2025-02-13 05:54:34', 623.00, '1', 3),
-(1739426459, 6, '2025-02-13 06:00:59', 1500.00, '1', 1),
-(1739426499, 1738895546, '2025-02-13 06:01:39', 2123.00, '1', 2),
-(1739426533, 3, '2025-02-13 06:02:13', 1750.50, '1', 1);
+INSERT INTO `orders` (`id`, `client_id`, `order_date`, `total`, `status`, `admin`, `promotions`) VALUES
+(3, 1, '2025-01-13 09:25:36', 200.00, '0', 1, NULL),
+(5, 2, '2025-01-14 03:15:45', 300.00, '0', 1, NULL),
+(1738732062, 6, '2025-02-05 05:07:42', 1600.00, '1', 1, NULL),
+(1738732563, 3, '2025-02-05 05:16:03', 250.50, '0', 1, NULL),
+(1738732643, 2, '2025-02-05 05:17:23', 500.00, '0', 1, NULL),
+(1738732738, 6, '2025-02-05 05:18:58', 500.00, '0', 1, NULL),
+(1738818886, 3, '2025-02-06 05:14:46', 623.00, '1', 1, NULL),
+(1738818896, 2, '2025-02-06 05:14:56', 1750.50, '1', 1, NULL),
+(1738895546, 1738895546, '2025-02-07 02:32:26', 250.50, '1', 1, NULL),
+(1739250762, 2, '2025-02-11 05:12:42', 1750.50, '1', 1, NULL),
+(1739423871, 2, '2025-02-13 05:17:51', 2123.00, '0', 2, NULL),
+(1739424654, 1738895546, '2025-02-13 05:30:54', 2123.00, '0', 2, NULL),
+(1739424731, 1738895546, '2025-02-13 05:32:11', 250.50, '0', 2, NULL),
+(1739424751, 6, '2025-02-13 05:32:31', 2123.00, '0', 3, NULL),
+(1739425148, 6, '2025-02-13 05:39:08', 1500.00, '1', 3, NULL),
+(1739426074, 6, '2025-02-13 05:54:34', 623.00, '1', 3, NULL),
+(1739426459, 6, '2025-02-13 06:00:59', 1500.00, '1', 1, NULL),
+(1739426499, 1738895546, '2025-02-13 06:01:39', 2123.00, '1', 2, NULL),
+(1739426533, 3, '2025-02-13 06:02:13', 1750.50, '1', 1, NULL),
+(1742010259, 1, '2025-03-15 03:44:19', 150.50, '1', 1, NULL),
+(1742010260, 1738895547, '2025-03-15 03:50:01', 123.00, '1', 1, 1),
+(1742010261, 1738895547, '2025-03-15 03:55:42', 123.00, '1', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -144,7 +148,9 @@ INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `price`) 
 (69, 1739426499, 9, 1, 500.00),
 (70, 1739426533, 1, 1, 100.00),
 (71, 1739426533, 2, 1, 150.50),
-(72, 1739426533, 6, 1, 1500.00);
+(72, 1739426533, 6, 1, 1500.00),
+(73, 1742010259, 2, 1, 150.50),
+(75, 1742010261, 8, 1, 123.00);
 
 -- --------------------------------------------------------
 
@@ -174,6 +180,32 @@ INSERT INTO `products` (`id`, `name`, `description`, `price`, `stock`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `promotions`
+--
+
+CREATE TABLE `promotions` (
+  `id` int(11) NOT NULL,
+  `path_to_image` varchar(256) DEFAULT NULL,
+  `title` varchar(256) NOT NULL,
+  `body` varchar(256) NOT NULL,
+  `code_promo` varchar(256) NOT NULL,
+  `uses` int(11) NOT NULL,
+  `max_uses` int(11) NOT NULL,
+  `cancel_at` date NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `discount` int(11) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Дамп данных таблицы `promotions`
+--
+
+INSERT INTO `promotions` (`id`, `path_to_image`, `title`, `body`, `code_promo`, `uses`, `max_uses`, `cancel_at`, `created_at`, `discount`) VALUES
+(1, 'summer_promo.jpg', 'Летняя распродажа', 'СКИДКА', 'RCKARASUK', 2, 10, '2025-03-31', '2025-03-15 02:54:48', 0);
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `tickets`
 --
 
@@ -192,10 +224,15 @@ CREATE TABLE `tickets` (
 --
 
 INSERT INTO `tickets` (`id`, `type`, `message`, `client`, `admin`, `create_at`, `status`) VALUES
-(1, 'tech', 'проблема', 1, 2, '2025-03-10 04:04:44', 'Ожидает'),
+(1, 'tech', 'проблема', 1, 2, '2025-03-10 04:04:44', 'Выполнено'),
 (2, 'crm', 'ОНА НЕ РАБОТАЕТ ААААААА', 3, 2, '2025-03-10 04:05:50', 'Ожидает'),
-(3, 'tech', 'виталя лох', 1, NULL, '2025-03-13 07:54:48', 'Ожидает'),
-(4, 'tech', 'gfhgfh', 2, NULL, '2025-03-13 07:55:29', 'Ожидает');
+(3, 'tech', 'виталя лох', 1, 2, '2025-03-13 07:54:48', 'В работе'),
+(4, 'tech', 'gfhgfh', 2, NULL, '2025-03-13 07:55:29', 'Ожидает'),
+(5, 'crm', '...', 1, NULL, '2025-03-14 01:56:34', 'Ожидает'),
+(6, 'tech', '...', 1, NULL, '2025-03-14 01:58:13', 'Ожидает'),
+(7, 'tech', '...', 1, NULL, '2025-03-14 01:58:17', 'Ожидает'),
+(8, 'crm', '......', 1, 2, '2025-03-14 02:00:34', 'В работе'),
+(9, 'crm', '....', 1, 2, '2025-03-14 02:00:38', 'В работе');
 
 -- --------------------------------------------------------
 
@@ -210,6 +247,14 @@ CREATE TABLE `tickets_message` (
   `message` varchar(256) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Дамп данных таблицы `tickets_message`
+--
+
+INSERT INTO `tickets_message` (`id`, `ticket_id`, `user_id`, `message`, `created_at`) VALUES
+(1, 9, 1, 'привет', '2025-03-14 02:59:27'),
+(2, 9, 2, 'привет, в чем проблоема?', '2025-03-14 03:10:09');
 
 -- --------------------------------------------------------
 
@@ -232,8 +277,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `login`, `password`, `name`, `surname`, `token`, `type`) VALUES
-(1, 'admin', 'admin123', 'Administrator', 'kitchen', NULL, 'admin'),
-(2, 'manager', '456', 'Manager', '', 'bG9naW49J21hbmFnZXInJnBhc3N3b3JkPSc0NTYnJnVuaXF1ZT0xNzQxODUyNTA5', 'tech'),
+(1, 'admin', 'admin123', 'Administrator', 'kitchen', 'bG9naW49J2FkbWluJyZwYXNzd29yZD0nYWRtaW4xMjMnJnVuaXF1ZT0xNzQyMDA3NjM0', 'admin'),
+(2, 'manager', '456', 'Manager', '', 'bG9naW49J21hbmFnZXInJnBhc3N3b3JkPSc0NTYnJnVuaXF1ZT0xNzQxOTIxODUw', 'tech'),
 (3, 'sales', 'sales789', 'Sales Representative', '', '', 'admin');
 
 --
@@ -270,6 +315,12 @@ ALTER TABLE `products`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Индексы таблицы `promotions`
+--
+ALTER TABLE `promotions`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Индексы таблицы `tickets`
 --
 ALTER TABLE `tickets`
@@ -302,13 +353,13 @@ ALTER TABLE `clients`
 -- AUTO_INCREMENT для таблицы `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1739426534;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1742010262;
 
 --
 -- AUTO_INCREMENT для таблицы `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT для таблицы `products`
@@ -317,16 +368,22 @@ ALTER TABLE `products`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
+-- AUTO_INCREMENT для таблицы `promotions`
+--
+ALTER TABLE `promotions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT для таблицы `tickets`
 --
 ALTER TABLE `tickets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT для таблицы `tickets_message`
 --
 ALTER TABLE `tickets_message`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT для таблицы `users`
