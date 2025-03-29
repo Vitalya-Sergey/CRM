@@ -42,6 +42,7 @@ require_once 'api/helpers/selectDefaultValue.php';
                 <li><a href="clients.php">Клиенты</a></li>
                 <li><a href="products.php">Товары</a></li>
                 <li><a href="orders.php">Заказы</a></li>
+                <li><a href="promotions.php">Акции</a></li>
                 <?php
                 require_once 'api/helpers/getUserType.php';
                     $userType = getUserType($db);

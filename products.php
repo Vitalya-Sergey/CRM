@@ -38,9 +38,19 @@ require_once 'api/helpers/selectDefaultValue.php';
             
             ?></p>
             <ul class="header_link">
-            <li><a href="clients.php">Клиенты</a></li>
+                <li><a href="clients.php">Клиенты</a></li>
                 <li><a href="products.php">Товары</a></li>
                 <li><a href="orders.php">Заказы</a></li>
+                <li><a href="promotions.php">Акции</a></li>
+                <?php
+                require_once 'api/helpers/getUserType.php';
+                    $userType = getUserType($db);
+                if ($userType == 'tech') {
+                    echo'
+                    <li><a href="tech.php">Обращения пользователя</a></li>
+                    ';
+                }
+                ?>
             </ul>
             <a class="header_login" href="?do=logout">Выйти <i class="fa fa-sign-out" aria-hidden="true"></i>
             </a>
